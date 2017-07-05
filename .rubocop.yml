@@ -1,0 +1,206 @@
+AllCops:
+  DisplayCopNames: true
+  TargetRubyVersion: 2.4
+  Exclude:
+    - polist.gemspec
+
+
+# Layout
+
+Layout/AlignParameters:
+  Enabled: true
+
+# Layout/MultilineMethodCallIndentation:
+#   Enabled: false
+
+# Layout/MultilineOperationIndentation:
+#   Enabled: false
+
+Layout/SpaceInLambdaLiteral:
+  EnforcedStyle: require_space
+
+Layout/SpaceInsideBrackets:
+  Enabled: false
+
+Layout/IndentArray:
+  EnforcedStyle: consistent
+
+Layout/IndentHash:
+  EnforcedStyle: consistent
+
+# Lint
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
+Lint/AmbiguousOperator:
+  Enabled: false
+
+Lint/NonLocalExitFromIterator:
+  Enabled: false
+
+Lint/HandleExceptions:
+  Enabled: false
+
+Lint/RescueType:
+  Enabled: true
+
+Lint/ShadowingOuterLocalVariable:
+  Enabled: false
+
+Lint/ScriptPermission:
+  Enabled: true
+
+# Metrics
+
+# Metrics/AbcSize:
+#   Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+
+# Metrics/ClassLength:
+#   Enabled: false
+
+# Metrics/CyclomaticComplexity:
+#   Enabled: false
+
+Metrics/LineLength:
+  Max: 100
+
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+# Performance
+
+Performance/Caller:
+  Enabled: true
+
+Performance/Casecmp:
+  Enabled: false
+
+# Security
+
+Security/YAMLLoad:
+  Enabled: false
+
+# Style
+
+Style/AccessorMethodName:
+  # This cop assumes every method is accessor
+  Enabled: false
+
+Style/AndOr:
+  # `do_something and return`
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  # Enable it in non-rails projects with EnforcedStyle you prefer
+  Enabled: false
+
+Style/CommentAnnotation:
+  # Also, i think that better to use yard's `@todo` and other in ruby code
+  Enabled: false
+
+Style/ConditionalAssignment:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/DoubleNegation:
+  # Always return booleans in predicates
+  Enabled: false
+
+Style/EmptyCaseCondition:
+  Enabled: false
+
+Style/EmptyElse:
+  Enabled: false
+
+Style/Encoding:
+  Enabled: false
+
+Style/FormatStringToken:
+  Enabled: true
+
+Style/IfUnlessModifier:
+  Enabled: true
+
+Style/GuardClause:
+  Enabled: false
+
+Style/HashSyntax:
+  Exclude:
+    - Rakefile
+
+Style/LambdaCall:
+  Enabled: false
+
+Style/ModuleFunction:
+  Enabled: false
+
+Style/MultilineTernaryOperator:
+  Enabled: false
+
+Style/MultipleComparison:
+  Enabled: true
+
+Style/NumericLiterals:
+  Description: 'Use indent in groups of 3 unlesss you meet project-specific rule'
+  Enabled: false
+
+Style/ParallelAssignment:
+  Enabled: false
+
+Style/PerlBackrefs:
+  Enabled: true
+
+Style/PredicateName:
+  NamePrefixBlacklist:
+    - is_
+
+Style/RaiseArgs:
+  Description: 'Use `raise, ErrorClass` in all cases but not when you need ErrorClass constructor'
+  Enabled: false
+
+Style/RegexpLiteral:
+  EnforcedStyle: mixed
+  Enabled: true
+
+Style/RescueModifier:
+  Enabled: false
+
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+  ConsistentQuotesInMultiline: true
+
+Style/SignalException:
+  EnforcedStyle: only_raise
+
+Style/SingleLineBlockParams:
+  Enabled: false
+
+Style/StringLiteralsInInterpolation:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrivialAccessors:
+  AllowPredicates: true
+  Enabled: false
+
+Style/YodaCondition:
+  Enabled: false
