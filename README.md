@@ -1,39 +1,83 @@
 # Polist
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/polist`. To experiment with that code, run `bin/console` for an interactive prompt.
+`Polist::Service` is a simple class designed for creating service classes.
 
-TODO: Delete this and the text above, and describe your gem
+### Basic usage example
+```
+class MyService < Polist::Service
+  def call
+    if params[:ok]
+      success!(code: :cool)
+    else
+      fail!(code: :not_cool)
+    end
+  end
+end
 
-## Installation
+service = MyService.run(ok: true)
+service.success? #=> true
+service.response #=> { code: :cool }
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'polist'
+service = MyService.run(ok: false)
+service.success? #=> false
+service.response #=> { code: :not_cool }
 ```
 
-And then execute:
+The only parameter that is passed to the service is called `params` by default. If you want more params, feel free to define your own initializer and call the service accordingly:
 
-    $ bundle
+```
+class MyService < Polist::Service
+  def initialize(a, b, c)
+    # ...
+  end
+end
 
-Or install it yourself as:
+MyService.call(1, 2, 3)
+```
 
-    $ gem install polist
+Unlike `.run`, `.call` will raise `Polist::Service::Failure` exception on failure:
 
-## Usage
+```
+begin
+  MyService.call(ok: false)
+rescue Polist::Service::Failure => error
+  error.response #=> { code: :not_cool }
+end
+```
 
-TODO: Write usage instructions here
+Note that `.run` and `.call` are just shortcuts for `MyService.new(...).run` and `MyService.new(...).call` with the only difference that they always return the service instance instead of the result of `#run` or `#call`. Unlike `#call` though, `#run` is not intended to be owerwritten in subclasses.
 
-## Development
+### Using Form objects
+Sometimes you want to use some kind of params parsing and/or validation, and you can do that with the help of `Polist::Service::Form` class. It uses [tainbox](https://github.com/enthrops/tainbox) gem under the hood.
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+```
+class MyService < Polist::Service
+  class Form < Polist::Service::Form
+    attribute :param1, :String
+    attribute :param2, :Integer
+    attribute :param3, :String, default: "smth"
+    attribute :param4, :String
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+    validates :param4, presence: true
+  end
 
-## Contributing
+  def call
+    p form.valid?
+    p [form.param1, form.param2, form.param3]
+  end
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/tycooon/polist.
+  # The commented code is just the default implementation and can be simply overwritten
+  # private
 
-## License
+  # def form
+  #   @form ||= self.class::Form.new(form_attributes.to_snake_keys)
+  # end
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+  # def form_attributes
+  #   params
+  # end
+end
+
+MyService.call(param1: "1", param2: "2") # prints false and then ["1", 2, "smth"]
+```
+The `#form` method is there just for convinience and by default it uses what `#form_attributes` returns as the attributes for the default form class which is the services' `Form` class. You are free to use as many different form classes as you want in your service.
