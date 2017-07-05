@@ -3,7 +3,7 @@
 `Polist::Service` is a simple class designed for creating service classes.
 
 ### Basic usage example
-```
+```ruby
 class MyService < Polist::Service
   def call
     if params[:ok]
@@ -25,7 +25,7 @@ service.response #=> { code: :not_cool }
 
 The only parameter that is passed to the service is called `params` by default. If you want more params, feel free to define your own initializer and call the service accordingly:
 
-```
+```ruby
 class MyService < Polist::Service
   def initialize(a, b, c)
     # ...
@@ -37,7 +37,7 @@ MyService.call(1, 2, 3)
 
 Unlike `.run`, `.call` will raise `Polist::Service::Failure` exception on failure:
 
-```
+```ruby
 begin
   MyService.call(ok: false)
 rescue Polist::Service::Failure => error
@@ -50,7 +50,7 @@ Note that `.run` and `.call` are just shortcuts for `MyService.new(...).run` and
 ### Using Form objects
 Sometimes you want to use some kind of params parsing and/or validation, and you can do that with the help of `Polist::Service::Form` class. It uses [tainbox](https://github.com/enthrops/tainbox) gem under the hood.
 
-```
+```ruby
 class MyService < Polist::Service
   class Form < Polist::Service::Form
     attribute :param1, :String
