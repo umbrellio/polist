@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "active_model/validations"
+require "active_model"
 require "plissken"
 require "tainbox"
 
@@ -22,6 +22,10 @@ module Polist
 
     attr_accessor :params
 
+    def self.build(*args)
+      new(*args)
+    end
+
     def self.call(*args)
       build(*args).tap(&:call)
     end
@@ -36,7 +40,7 @@ module Polist
       end
     end
 
-    def initialize(params)
+    def initialize(params = {})
       self.params = params
     end
 
