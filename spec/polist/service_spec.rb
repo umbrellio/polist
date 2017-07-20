@@ -41,6 +41,23 @@ class ServiceWithParams < BasicService
   end
 end
 
+class FailingInnerService < BasicService
+  def call
+    params[:fail] ? error!("message") : success!
+  end
+end
+
+class FailingOuterService < BasicService
+  def call
+    FailingInnerService.call(fail: params[:inner_fail])
+    fail!
+  rescue FailingInnerService::Failure
+    error!("inner service failure")
+  rescue Failure
+    error!("failure")
+  end
+end
+
 RSpec.describe Polist::Service do
   specify "basic usage" do
     service = BasicService.run
@@ -83,6 +100,20 @@ RSpec.describe Polist::Service do
       service = ServiceWithParams.run(p1: "1", p2: "2")
       expect(service.success?).to eq(true)
       expect(service.response).to eq(params: ["1", "2"])
+    end
+  end
+
+  describe "service with inner service call" do
+    specify "inner service fails" do
+      service = FailingOuterService.run(inner_fail: true)
+      expect(service.success?).to eq(false)
+      expect(service.response).to eq(error: "inner service failure")
+    end
+
+    specify "inner service doesn't fail" do
+      service = FailingOuterService.run(inner_fail: false)
+      expect(service.success?).to eq(false)
+      expect(service.response).to eq(error: "failure")
     end
   end
 end

@@ -22,6 +22,10 @@ module Polist
 
     attr_accessor :params
 
+    def self.inherited(klass)
+      klass.const_set(:Failure, Class.new(klass::Failure))
+    end
+
     def self.build(*args)
       new(*args)
     end
