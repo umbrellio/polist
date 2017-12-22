@@ -52,7 +52,7 @@ module Polist
 
     def run
       call
-    rescue Failure => error
+    rescue self.class::Failure => error
       @response = error.response
       @failure = true
     end
