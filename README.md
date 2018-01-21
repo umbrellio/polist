@@ -2,6 +2,9 @@
 
 `Polist::Service` is a simple class designed for creating service classes.
 
+### Installation
+Juts add `gem "polist"` to your Gemfile.
+
 ### Basic usage example
 ```ruby
 class MyService < Polist::Service
