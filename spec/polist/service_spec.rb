@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "spec_helper"
-
 class BasicService < Polist::Service
   def call
     success!(a: 1)
