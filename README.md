@@ -84,3 +84,9 @@ end
 MyService.call(param1: "1", param2: "2") # prints false and then ["1", 2, "smth"]
 ```
 The `#form` method is there just for convinience and by default it uses what `#form_attributes` returns as the attributes for the default form class which is the services' `Form` class. You are free to use as many different form classes as you want in your service.
+
+## License
+Released under MIT License.
+
+## Authors
+Created by Yuri Smirnov, supported by [Umbrellio](https://umbrellio.biz).
