@@ -1,4 +1,4 @@
-# Polist
+# Polist   [![Build Status](https://travis-ci.org/umbrellio/polist.svg?branch=master)](https://travis-ci.org/umbrellio/polist)
 
 `Polist::Service` is a simple class designed for creating service classes.
 
