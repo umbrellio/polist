@@ -48,7 +48,8 @@ module Polist
       self.params = params
     end
 
-    def call; end # Should be implemented in subclasses
+    # Should be implemented in subclasses
+    def call; end
 
     def run
       call

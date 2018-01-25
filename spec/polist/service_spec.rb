@@ -25,8 +25,6 @@ class ServiceWithValidations < ServiceWithForm
     validates :c, presence: { message: "bad c" }
   end
 
-  Failure = Class.new(Polist::Service::Failure)
-
   def call
     validate!
     super
@@ -105,7 +103,7 @@ RSpec.describe Polist::Service do
     specify "basic params usage" do
       service = ServiceWithParams.run(p1: "1", p2: "2")
       expect(service.success?).to eq(true)
-      expect(service.response).to eq(params: ["1", "2"])
+      expect(service.response).to eq(params: %w[1 2])
     end
   end
 
