@@ -89,4 +89,8 @@ The `#form` method is there just for convinience and by default it uses what `#f
 Released under MIT License.
 
 ## Authors
-Created by Yuri Smirnov, supported by [Umbrellio](https://umbrellio.biz).
+Created by Yuri Smirnov.
+
+<a href="https://github.com/umbrellio/">
+<img style="float: left;" src="https://umbrellio.github.io/Umbrellio/supported_by_umbrellio.svg" alt="Supported by Umbrellio" width="439" height="72">
+</a>
