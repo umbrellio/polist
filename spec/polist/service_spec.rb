@@ -25,7 +25,6 @@ class ServiceWithValidations < ServiceWithForm
 
   def call
     validate!
-    super
   end
 end
 
