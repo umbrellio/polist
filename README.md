@@ -48,7 +48,7 @@ rescue Polist::Service::Failure => error
 end
 ```
 
-Note that `.run` and `.call` are just shortcuts for `MyService.new(...).run` and `MyService.new(...).call` with the only difference that they always return the service instance instead of the result of `#run` or `#call`. Unlike `#call` though, `#run` is not intended to be owerwritten in subclasses.
+Note that `.run` and `.call` are just shortcuts for `MyService.new(...).run` and `MyService.new(...).call` with the only difference that they always return the service instance instead of the result of `#run` or `#call`. Unlike `#call` though, `#run` is not intended to be overwritten in subclasses.
 
 ### Using Form objects
 Sometimes you want to use some kind of params parsing and/or validation, and you can do that with the help of `Polist::Service::Form` class. It uses [tainbox](https://github.com/enthrops/tainbox) gem under the hood.
@@ -84,6 +84,40 @@ end
 MyService.call(param1: "1", param2: "2") # prints false and then ["1", 2, "smth"]
 ```
 The `#form` method is there just for convinience and by default it uses what `#form_attributes` returns as the attributes for the default form class which is the services' `Form` class. You are free to use as many different form classes as you want in your service.
+
+### Using Middlewares
+
+If you have some common things to be done in more than one service, you can define a middleware and register it inside the said services.
+Every middleware takes the service into it's constructor and executes `#call`. Thus every middleware has to implement `#call` method and has a `#service` attribute reader.
+Middlewares delegate `#success!`, `#fail!`, `#error!`, `#form`, `#form_attributes` to the service class they are registered in.
+Every middleware should be a subclass of `Polist::Service::Middleware`. Middlewares are run before the service itself is run.
+
+To register a middleware one should use `.register_middleware` class method on a service. More than one middleware can be registered for one service.
+
+For example:
+```ruby
+class MyMiddleware < Polist::Service::Middleware
+  def call
+    fail!(code: :not_cool) if service.fail_on_middleware?
+  end
+end
+
+class MyService < Polist::Service
+  register_middleware MyMiddleware
+
+  def call
+    success!(code: :cool)
+  end
+  
+  def fail_on_middleware?
+    true
+  end  
+end
+
+service = MyService.run
+service.success? #=> false
+service.response #=> { code: :not_cool }
+```
 
 ## License
 Released under MIT License.

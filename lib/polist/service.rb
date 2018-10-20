@@ -20,6 +20,8 @@ module Polist
       include ActiveModel::Validations
     end
 
+    MiddlewareError = Class.new(StandardError)
+
     attr_accessor :params
 
     def self.inherited(klass)
@@ -44,6 +46,23 @@ module Polist
       end
     end
 
+    def self.__polist_middlewares__
+      @__polist_middlewares__ ||= []
+    end
+
+    def self.register_middleware(klass)
+      unless klass < Polist::Service::Middleware
+        raise MiddlewareError,
+              "Middleware #{klass} should be a subclass of Polist::Service::Middleware"
+      end
+
+      __polist_middlewares__ << klass
+    end
+
+    def self.__clear_middlewares__
+      @__polist_middlewares__ = []
+    end
+
     def initialize(params = {})
       self.params = params
     end
@@ -52,6 +71,7 @@ module Polist
     def call; end
 
     def run
+      call_middlewares
       call
     rescue self.class::Failure => error
       @response = error.response
@@ -75,6 +95,12 @@ module Polist
     end
 
     private
+
+    def call_middlewares
+      self.class.__polist_middlewares__.each do |middleware|
+        middleware.new(self).call
+      end
+    end
 
     def form
       @form ||= self.class::Form.new(form_attributes.to_snake_keys)
