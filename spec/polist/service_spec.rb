@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+class NoResponseService < Polist::Service
+  def call; end
+end
+
 class BasicService < Polist::Service
   def call
     success!(a: 1)
@@ -65,6 +69,12 @@ RSpec.describe Polist::Service do
     expect(service.success?).to eq(true)
     expect(service.failure?).to eq(false)
     expect(service.response).to eq(a: 1)
+  end
+
+  specify "no response service" do
+    service = NoResponseService.run
+    expect(service.success?).to eq(true)
+    expect(service.response).to eq(nil)
   end
 
   describe "service with form" do

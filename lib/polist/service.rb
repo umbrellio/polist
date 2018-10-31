@@ -59,7 +59,7 @@ module Polist
     end
 
     def response
-      @response ||= {}
+      @response
     end
 
     def failure?
@@ -84,7 +84,7 @@ module Polist
       params
     end
 
-    def fail!(response = {})
+    def fail!(response = nil)
       raise self.class::Failure.new(response)
     end
 
@@ -92,7 +92,7 @@ module Polist
       fail!(error: message)
     end
 
-    def success!(response = {})
+    def success!(response = nil)
       @response = response
     end
   end
