@@ -23,43 +23,76 @@ RSpec.describe Polist::Service::Middleware do
       ServiceWithMiddlewares.register_middleware SecondMiddleware
     end
 
-    specify "middlewares are called when service is ran" do
-      expect_any_instance_of(FirstMiddleware).to receive(:call)
-      expect_any_instance_of(SecondMiddleware).to receive(:call)
+    shared_examples "middlewares are called" do |service_call|
+      specify do
+        expect_any_instance_of(FirstMiddleware).to receive(:call)
+        expect_any_instance_of(SecondMiddleware).to receive(:call)
 
-      service = ServiceWithMiddlewares.run
-      expect(service.success?).to eq(true)
-      expect(service.failure?).to eq(false)
-      expect(service.response).to eq(success: true)
-    end
-  end
-
-  specify "middlewares can affect the response of the service" do
-    middleware = Class.new(Polist::Service::Middleware) do
-      def call
-        fail!(failed: true)
+        service = service_call.()
+        expect(service.success?).to eq(true)
+        expect(service.failure?).to eq(false)
+        expect(service.response).to eq(success: true)
       end
     end
 
-    ServiceWithMiddlewares.register_middleware middleware
-
-    service = ServiceWithMiddlewares.run
-    expect(service.success?).to eq(false)
-    expect(service.failure?).to eq(true)
-    expect(service.response).to eq(failed: true)
+    it_behaves_like "middlewares are called", -> { ServiceWithMiddlewares.run }
+    it_behaves_like "middlewares are called", -> { ServiceWithMiddlewares.call }
   end
 
-  specify "middlewares delegate methods to service" do
-    middleware = Class.new(Polist::Service::Middleware) do
-      def call
-        form
-        form_attributes
-        success!
+  describe "middlewares affect the response of the service" do
+    describe "#run" do
+      specify "#response is mutated and error is rescued" do
+        middleware = Class.new(Polist::Service::Middleware) do
+          def call
+            fail!(failed: true)
+          end
+        end
+
+        ServiceWithMiddlewares.register_middleware middleware
+
+        expect { ServiceWithMiddlewares.run }.not_to raise_error
+
+        service = ServiceWithMiddlewares.run
+        expect(service.success?).to eq(false)
+        expect(service.failure?).to eq(true)
+        expect(service.response).to eq(failed: true)
       end
     end
 
-    ServiceWithMiddlewares.register_middleware middleware
+    describe "#call" do
+      specify "error is raised" do
+        middleware = Class.new(Polist::Service::Middleware) do
+          def call
+            fail!(failed: true)
+          end
+        end
 
-    expect { ServiceWithMiddlewares.run }.not_to raise_error
+        ServiceWithMiddlewares.register_middleware middleware
+
+        expect { ServiceWithMiddlewares.call }
+          .to raise_error(ServiceWithMiddlewares::Failure, "{:failed=>true}")
+      end
+    end
+  end
+
+  describe "middlewares delegate methods to service" do
+    shared_examples "no errors are raised" do |service_call|
+      specify do
+        middleware = Class.new(Polist::Service::Middleware) do
+          def call
+            form
+            form_attributes
+            success!
+          end
+        end
+
+        ServiceWithMiddlewares.register_middleware middleware
+
+        expect { service_call.() }.not_to raise_error
+      end
+    end
+
+    it_behaves_like "no errors are raised", -> { ServiceWithMiddlewares.run }
+    it_behaves_like "no errors are raised", -> { ServiceWithMiddlewares.call }
   end
 end

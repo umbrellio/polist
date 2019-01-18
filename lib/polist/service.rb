@@ -20,12 +20,20 @@ module Polist
       include ActiveModel::Validations
     end
 
+    module MiddlewareCaller
+      def call
+        call_middlewares
+        super
+      end
+    end
+
     MiddlewareError = Class.new(StandardError)
 
     attr_accessor :params
 
     def self.inherited(klass)
       klass.const_set(:Failure, Class.new(klass::Failure))
+      klass.prepend MiddlewareCaller
     end
 
     def self.build(*args)
@@ -71,7 +79,6 @@ module Polist
     def call; end
 
     def run
-      call_middlewares
       call
     rescue self.class::Failure => error
       @response = error.response
