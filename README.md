@@ -147,7 +147,7 @@ SuperAdmin.build("smth") # => #<Admin::SuperAdmin:... @role="admin">
 
 ## Using Polist::Struct
 
-Work pretty much the same like Ruby `Struct` class, but you don't have to subclass it.
+Works pretty much the same like Ruby `Struct` class, but you don't have to subclass it.
 
 Can be used with `Polist::Service` or any other class that don't have initializer specified.
 
