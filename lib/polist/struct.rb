@@ -2,17 +2,19 @@
 
 module Polist
   module Struct
-    def self.struct(receiver, *attrs)
-      instance_method(:struct).bind(receiver).call(*attrs)
+    module ClassMethods
+      def struct(*attrs)
+        attr_accessor(*attrs)
+
+        define_method(:initialize) do |*args|
+          raise ArgumentError, "struct size differs" if args.length > attrs.length
+          attrs.zip(args).each { |attr, val| public_send(:"#{attr}=", val) }
+        end
+      end
     end
 
-    def struct(*attrs)
-      attr_accessor(*attrs)
-
-      define_method(:initialize) do |*args|
-        raise ArgumentError, "struct size differs" if args.length > attrs.length
-        attrs.zip(args).each { |attr, val| public_send(:"#{attr}=", val) }
-      end
+    def self.included(base)
+      base.extend(ClassMethods)
     end
   end
 end
