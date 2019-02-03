@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Yuri Smirnov"]
   spec.email         = ["tycooon@yandex.ru"]
 
-  spec.summary       = "A gem for creating simple service classes."
-  spec.description   = "Polist is a gem for creating simple service classes."
+  spec.summary       = "A gem for creating simple service classes and more."
+  spec.description   = "Polist is a gem for creating simple service classes and more."
   spec.homepage      = "https://github.com/umbrellio/polist"
   spec.license       = "MIT"
 

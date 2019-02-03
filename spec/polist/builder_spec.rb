@@ -19,10 +19,10 @@ end
 
 class Admin < User
   builds do |role|
-    role == "super_admin" ? SuperAdmin : Admin
+    SuperAdmin if role == "super_admin"
   end
 
-  class SuperAdmin < self
+  class SuperAdmin < Admin
     def super?
       true
     end

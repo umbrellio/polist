@@ -1,11 +1,17 @@
 # Polist   [![Gem Version](https://badge.fury.io/rb/polist.svg)](https://badge.fury.io/rb/polist) [![Build Status](https://travis-ci.org/umbrellio/polist.svg?branch=master)](https://travis-ci.org/umbrellio/polist) [![Coverage Status](https://coveralls.io/repos/github/umbrellio/polist/badge.svg?branch=master)](https://coveralls.io/github/umbrellio/polist?branch=master)
 
-`Polist::Service` is a simple class designed for creating service classes.
+Polist is a set of simple tools for creating business logic layer of your applications:
 
-### Installation
+- `Polist::Service` is a simple class designed for creating service classes.
+- `Polist::Builder` is a builder system based on `Uber::Builder`.
+- `Polist::Struct` is a small utility that helps generating simple `Struct`-like object initializers.
+
+## Installation
+
 Simply add `gem "polist"` to your Gemfile.
 
-### Basic usage example
+## Using Polist::Service
+
 ```ruby
 class MyService < Polist::Service
   def call
@@ -51,6 +57,7 @@ end
 Note that `.run` and `.call` are just shortcuts for `MyService.new(...).run` and `MyService.new(...).call` with the only difference that they always return the service instance instead of the result of `#run` or `#call`. Unlike `#call` though, `#run` is not intended to be owerwritten in subclasses.
 
 ### Using Form objects
+
 Sometimes you want to use some kind of params parsing and/or validation, and you can do that with the help of `Polist::Service::Form` class. It uses [tainbox](https://github.com/enthrops/tainbox) gem under the hood.
 
 ```ruby
@@ -83,12 +90,95 @@ end
 
 MyService.call(param1: "1", param2: "2") # prints false and then ["1", 2, "smth"]
 ```
+
 The `#form` method is there just for convinience and by default it uses what `#form_attributes` returns as the attributes for the default form class which is the services' `Form` class. You are free to use as many different form classes as you want in your service.
 
+## Using Polist::Builder
+
+The build logic is based on [Uber::Builder](https://github.com/apotonick/uber#builder) but it allows recursive builders. See the example:
+
+Can be used with `Polist::Service` or any other Ruby class.
+
+```ruby
+class User
+  include Polist::Builder
+
+  builds do |role|
+    case role
+    when /admin/
+      Admin
+    end
+  end
+
+  attr_accessor :role
+
+  def initialize(role)
+    self.role = role
+  end
+end
+
+class Admin < User
+  builds do |role|
+    SuperAdmin if role == "super_admin"
+  end
+
+  class SuperAdmin < Admin
+    def super?
+      true
+    end
+  end
+
+  def super?
+    false
+  end
+end
+
+User.build("user") # => #<User:... @role="user">
+
+User.build("admin") # => #<Admin:... @role="admin">
+User.build("admin").super? # => false
+
+User.build("super_admin") # => #<Admin::SuperAdmin:... @role="super_admin">
+User.build("super_admin").super? # => true
+
+Admin.build("smth") # => #<Admin:... @role="admin">
+SuperAdmin.build("smth") # => #<Admin::SuperAdmin:... @role="admin">
+```
+
+## Using Polist::Struct
+
+Work pretty much the same like Ruby `Struct` class, but you don't have to subclass it.
+
+Can be used with `Polist::Service` or any other class that don't have initializer specified.
+
+```ruby
+class Point
+  include Polist::Struct
+
+  struct :x, :y
+end
+
+a = Point.new(15, 25)
+a.x # => 15
+a.y # => 25
+
+b = Point.new(15, 25, 35) # raises ArgumentError: struct size differs
+
+c = Point.new(15)
+c.x # => 15
+c.y # => nil
+```
+
+## Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/umbrellio/polist.
+
 ## License
+
 Released under MIT License.
 
 ## Authors
+
 Created by Yuri Smirnov.
 
 <a href="https://github.com/umbrellio/">
