@@ -4,3 +4,6 @@ inherit_gem:
 AllCops:
   DisplayCopNames: true
   TargetRubyVersion: 2.5
+
+Naming/MemoizedInstanceVariableName:
+  Enabled: false
