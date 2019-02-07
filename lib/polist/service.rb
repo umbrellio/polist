@@ -22,7 +22,11 @@ module Polist
 
     module MiddlewareCaller
       def call
-        call_middlewares
+        unless @__polist_middlewares__called
+          call_middlewares
+          @__polist_middlewares__called = true
+        end
+
         super
       end
     end
@@ -33,7 +37,8 @@ module Polist
 
     def self.inherited(klass)
       klass.const_set(:Failure, Class.new(klass::Failure))
-      klass.prepend MiddlewareCaller
+      klass.prepend(MiddlewareCaller)
+      klass.instance_variable_set(:@__polist_middlewares__, @__polist_middlewares__.dup)
     end
 
     def self.build(*args)
