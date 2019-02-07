@@ -2,5 +2,6 @@
 
 require "polist/builder"
 require "polist/service"
+require "polist/service/middleware"
 require "polist/struct"
 require "polist/version"

@@ -54,7 +54,7 @@ rescue Polist::Service::Failure => error
 end
 ```
 
-Note that `.run` and `.call` are just shortcuts for `MyService.new(...).run` and `MyService.new(...).call` with the only difference that they always return the service instance instead of the result of `#run` or `#call`. Unlike `#call` though, `#run` is not intended to be owerwritten in subclasses.
+Note that `.run` and `.call` are just shortcuts for `MyService.new(...).run` and `MyService.new(...).call` with the only difference that they always return the service instance instead of the result of `#run` or `#call`. Unlike `#call` though, `#run` is not intended to be overwritten in subclasses.
 
 ### Using Form objects
 
@@ -167,6 +167,40 @@ b = Point.new(15, 25, 35) # raises ArgumentError: struct size differs
 c = Point.new(15)
 c.x # => 15
 c.y # => nil
+```
+
+### Using Middlewares
+
+If you have some common things to be done in more than one service, you can define a middleware and register it inside the said services.
+Every middleware takes the service into it's constructor and executes `#call`. Thus every middleware has to implement `#call` method and has a `#service` attribute reader.
+Middlewares delegate `#success!`, `#fail!`, `#error!`, `#form`, `#form_attributes` to the service class they are registered in.
+Every middleware should be a subclass of `Polist::Service::Middleware`. Middlewares are run before the service itself is run.
+
+To register a middleware one should use `.register_middleware` class method on a service. More than one middleware can be registered for one service.
+
+For example:
+```ruby
+class MyMiddleware < Polist::Service::Middleware
+  def call
+    fail!(code: :not_cool) if service.fail_on_middleware?
+  end
+end
+
+class MyService < Polist::Service
+  register_middleware MyMiddleware
+
+  def call
+    success!(code: :cool)
+  end
+  
+  def fail_on_middleware?
+    true
+  end  
+end
+
+service = MyService.run
+service.success? #=> false
+service.response #=> { code: :not_cool }
 ```
 
 ## Contributing

@@ -133,4 +133,25 @@ RSpec.describe Polist::Service do
       expect(service.response).to eq(error: "failure")
     end
   end
+
+  describe ".register_middleware" do
+    let(:first_middleware) { Class.new(Polist::Service::Middleware) }
+    let(:second_middleware) { Class.new(Polist::Service::Middleware) }
+
+    before do
+      BasicService.register_middleware(first_middleware)
+      BasicService.register_middleware(second_middleware)
+    end
+
+    it "stores middlewares in the service class" do
+      expect(BasicService.__polist_middlewares__)
+        .to contain_exactly(first_middleware, second_middleware)
+    end
+
+    it "raises error if middleware is not a subclass of Polist::Service::Middleware" do
+      expect { BasicService.register_middleware(String) }
+        .to raise_error(Polist::Service::MiddlewareError,
+                        "Middleware String should be a subclass of Polist::Service::Middleware")
+    end
+  end
 end
