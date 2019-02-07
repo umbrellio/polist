@@ -20,7 +20,7 @@
 
 [0.4.0]: https://github.com/umbrellio/polist/tree/v0.4.0
 [1.0.0]: https://github.com/umbrellio/polist/compare/v0.4.0...v1.0.0
-[1.0.0]: https://github.com/umbrellio/polist/compare/v1.0.0...v1.1.0
+[1.1.0]: https://github.com/umbrellio/polist/compare/v1.0.0...v1.1.0
 [Unreleased]: https://github.com/umbrellio/polist/compare/v1.1.0...HEAD
 
 [@nesaulov]: https://github.com/nesaulov
