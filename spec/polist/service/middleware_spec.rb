@@ -1,11 +1,17 @@
 # frozen_string_literal: true
 
+CALLS = [] # rubocop:disable Style/MutableConstant
+
 class FirstMiddleware < Polist::Service::Middleware
-  def call; end
+  def call
+    CALLS << :FirstMiddleware
+  end
 end
 
 class SecondMiddleware < Polist::Service::Middleware
-  def call; end
+  def call
+    CALLS << :SecondMiddleware
+  end
 end
 
 class ServiceWithMiddlewares < Polist::Service
@@ -15,7 +21,10 @@ class ServiceWithMiddlewares < Polist::Service
 end
 
 RSpec.describe Polist::Service::Middleware do
-  before { ServiceWithMiddlewares.__clear_middlewares__ }
+  before do
+    CALLS.clear
+    ServiceWithMiddlewares.__clear_middlewares__
+  end
 
   context "middlewares do nothing" do
     before do
@@ -23,20 +32,27 @@ RSpec.describe Polist::Service::Middleware do
       ServiceWithMiddlewares.register_middleware SecondMiddleware
     end
 
+    let!(:inherited_service) { Class.new(ServiceWithMiddlewares) }
+
     shared_examples "middlewares are called" do |service_call|
       specify do
-        expect_any_instance_of(FirstMiddleware).to receive(:call)
-        expect_any_instance_of(SecondMiddleware).to receive(:call)
+        service = instance_exec(&service_call)
 
-        service = service_call.()
         expect(service.success?).to eq(true)
         expect(service.failure?).to eq(false)
         expect(service.response).to eq(success: true)
+
+        expect(CALLS).to eq([:FirstMiddleware, :SecondMiddleware])
       end
     end
 
     it_behaves_like "middlewares are called", -> { ServiceWithMiddlewares.run }
     it_behaves_like "middlewares are called", -> { ServiceWithMiddlewares.call }
+
+    context "running on inherited class" do
+      it_behaves_like "middlewares are called", -> { inherited_service.run }
+      it_behaves_like "middlewares are called", -> { inherited_service.call }
+    end
   end
 
   describe "middlewares affect the response of the service" do
