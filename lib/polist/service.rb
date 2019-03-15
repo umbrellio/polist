@@ -45,12 +45,12 @@ module Polist
       new(*args)
     end
 
-    def self.call(*args)
-      build(*args).tap(&:call)
+    def self.call(*args, &block)
+      build(*args).tap { |service| service.call(&block) }
     end
 
-    def self.run(*args)
-      build(*args).tap(&:run)
+    def self.run(*args, &block)
+      build(*args).tap { |service| service.run(&block) }
     end
 
     def self.param(*names)
@@ -83,8 +83,8 @@ module Polist
     # Should be implemented in subclasses
     def call; end
 
-    def run
-      call
+    def run(&block)
+      call(&block)
     rescue self.class::Failure => error
       @response = error.response
       @failure = true

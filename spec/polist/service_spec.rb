@@ -63,6 +63,20 @@ class FailingOuterService < BasicService
   end
 end
 
+class ServiceWithBlock < BasicService
+  def call
+    success!(yield(1, 2))
+  end
+end
+
+class ServiceWichRescueBlock < BasicService
+  def call
+    yield
+  rescue StandardError => error
+    success!(error)
+  end
+end
+
 RSpec.describe Polist::Service do
   specify "basic usage" do
     service = BasicService.run
@@ -152,6 +166,20 @@ RSpec.describe Polist::Service do
       expect { BasicService.register_middleware(String) }
         .to raise_error(Polist::Service::MiddlewareError,
                         "Middleware String should be a subclass of Polist::Service::Middleware")
+    end
+  end
+
+  describe "service with yielding" do
+    it "sums args in proc" do
+      service = ServiceWithBlock.call { |a, b| a + b }
+      expect(service.success?).to eq(true)
+      expect(service.response).to eq(3)
+    end
+
+    it "runs, rescues, and returns success" do
+      service = ServiceWichRescueBlock.run { raise StandardError, "Awesome Message" }
+      expect(service.success?).to eq(true)
+      expect(service.response.message).to eq("Awesome Message")
     end
   end
 end
