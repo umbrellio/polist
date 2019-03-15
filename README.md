@@ -56,6 +56,43 @@ end
 
 Note that `.run` and `.call` are just shortcuts for `MyService.new(...).run` and `MyService.new(...).call` with the only difference that they always return the service instance instead of the result of `#run` or `#call`. Unlike `#call` though, `#run` is not intended to be overwritten in subclasses.
 
+### Using blocks in #call and #run methods.
+
+You can use yield in `#call`. And then call `::run` or `::call` class methods with block. For example, we have the class:
+```ruby
+class BlockFun < Polist::Service
+  def call
+    success!(yield(1, 2))
+  end
+end
+```
+
+Then we can use it like this:
+```ruby
+service = BlockFun.call { |a, b| a + b }
+
+p service.response # => 3
+```
+
+Behind the scenes it just catches passed block in class methods `::run` and `::call`, converts it to proc and then passes proc to instance method `#call` and `#run` by converting it back to block. So, for example, if you want to pass this block to private methods, you can write code like this:
+```ruby
+class AnotherBlockFun < Polist::Service
+  def call(&block)
+    success!(block_caller(&block))
+  end
+
+  private
+
+  def block_caller
+    yield 1, 2
+  end
+end
+
+service = AnotherBlockFun.call { |a, b| a + b }
+
+p service.response # => 3
+```
+
 ### Using Form objects
 
 Sometimes you want to use some kind of params parsing and/or validation, and you can do that with the help of `Polist::Service::Form` class. It uses [tainbox](https://github.com/enthrops/tainbox) gem under the hood.
@@ -192,10 +229,10 @@ class MyService < Polist::Service
   def call
     success!(code: :cool)
   end
-  
+
   def fail_on_middleware?
     true
-  end  
+  end
 end
 
 service = MyService.run
