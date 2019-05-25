@@ -72,8 +72,8 @@ end
 class ServiceWichRescueBlock < BasicService
   def call
     yield
-  rescue StandardError => error
-    success!(error)
+  rescue StandardError => e
+    success!(e)
   end
 end
 

@@ -85,8 +85,8 @@ module Polist
 
     def run(&block)
       call(&block)
-    rescue self.class::Failure => error
-      @response = error.response
+    rescue self.class::Failure => e
+      @response = e.response
       @failure = true
     end
 
