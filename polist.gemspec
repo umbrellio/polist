@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.name          = "polist"
   spec.version       = Polist::VERSION
   spec.authors       = ["Yuri Smirnov"]
-  spec.email         = ["tycooon@yandex.ru"]
+  spec.email         = ["tycooon@yandex.ru", "oss@umbrellio.biz"]
 
   spec.summary       = "A gem for creating simple service classes and more."
   spec.description   = "Polist is a gem for creating simple service classes and more."
