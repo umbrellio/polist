@@ -5,17 +5,17 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "polist/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "polist"
-  spec.version       = Polist::VERSION
-  spec.authors       = ["Yuri Smirnov"]
-  spec.email         = ["tycooon@yandex.ru", "oss@umbrellio.biz"]
+  spec.name    = "polist"
+  spec.version = Polist::VERSION
+  spec.authors = ["Yuri Smirnov"]
+  spec.email   = ["tycooon@yandex.ru", "oss@umbrellio.biz"]
 
-  spec.summary       = "A gem for creating simple service classes and more."
-  spec.description   = "Polist is a gem for creating simple service classes and more."
-  spec.homepage      = "https://github.com/umbrellio/polist"
-  spec.license       = "MIT"
+  spec.summary     = "A gem for creating simple service classes and more."
+  spec.description = "Polist is a gem for creating simple service classes and more."
+  spec.homepage    = "https://github.com/umbrellio/polist"
+  spec.license     = "MIT"
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^spec/}) }
+  spec.files = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^spec/}) }
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "activemodel", ">= 3.0"
@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "tainbox"
   spec.add_runtime_dependency "uber"
 
+  spec.add_development_dependency "rubocop-config-umbrellio"
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "coveralls"
   spec.add_development_dependency "pry"
