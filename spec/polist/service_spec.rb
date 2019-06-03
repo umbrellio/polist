@@ -153,6 +153,7 @@ RSpec.describe Polist::Service do
     let(:second_middleware) { Class.new(Polist::Service::Middleware) }
 
     before do
+      BasicService.__polist_middlewares__.clear
       BasicService.register_middleware(first_middleware)
       BasicService.register_middleware(second_middleware)
     end
