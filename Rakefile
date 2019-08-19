@@ -17,4 +17,4 @@ end
 
 RSpec::Core::RakeTask.new(:rspec)
 
-task default: :rspec
+task default: %i[rubocop rspec]
