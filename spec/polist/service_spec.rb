@@ -123,7 +123,9 @@ RSpec.describe Polist::Service do
 
   describe "service with inner service call" do
     specify do
-      expect { OuterService.run }.to raise_error(FailingInnerService::Failure)
+      expect { OuterService.run }.to raise_error(FailingInnerService::Failure) do |error|
+        expect(error.inspect).to eq('FailingInnerService::Failure: :error => "message"')
+      end
     end
   end
 
