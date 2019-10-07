@@ -18,7 +18,7 @@ class ServiceWithForm < BasicService
   end
 
   def call
-    form.b == 2 ? success!(form.attributes) : fail!(code: :bad_input)
+    form.b == 2 ? success!(form.attributes) : fail!(:failure, code: :bad_input)
   end
 end
 
@@ -28,7 +28,7 @@ class ServiceWithValidations < ServiceWithForm
   end
 
   def call
-    validate!
+    form.validate!
   end
 end
 
@@ -42,7 +42,7 @@ end
 
 class FailingInnerService < BasicService
   def call
-    params[:fail] ? error!("message") : success!
+    params[:fail] ? fail!(:error, "message") : success!
   end
 end
 
@@ -55,11 +55,11 @@ end
 class FailingOuterService < BasicService
   def call
     FailingInnerService.call(fail: params[:inner_fail])
-    fail!
+    fail!(:error)
   rescue FailingInnerService::Failure
-    error!("inner service failure")
+    fail!(:inner, "inner service failure")
   rescue Failure
-    error!("failure")
+    fail!(:outer, "failure")
   end
 end
 
@@ -102,21 +102,14 @@ RSpec.describe Polist::Service do
       service = ServiceWithForm.run(a: "1", b: "3")
       expect(service.success?).to eq(false)
       expect(service.response).to eq(code: :bad_input)
+      expect(service.failure_code).to eq(:failure)
     end
   end
 
   describe "service with form with validations" do
-    specify ".run method" do
-      service = ServiceWithValidations.run(a: "1", b: "2")
-      expect(service.success?).to eq(false)
-      expect(service.response).to eq(error: "bad c")
-    end
-
     specify ".call method" do
-      expect { ServiceWithValidations.call(a: "1", b: "2") }.to raise_error do |error|
-        expect(error.class).to eq(ServiceWithValidations::Failure)
-        expect(error.response).to eq(error: "bad c")
-      end
+      expect { ServiceWithValidations.call(a: "1", b: "2") }
+        .to raise_error(ActiveModel::ValidationError)
     end
   end
 
@@ -138,13 +131,15 @@ RSpec.describe Polist::Service do
     specify "inner service fails" do
       service = FailingOuterService.run(inner_fail: true)
       expect(service.success?).to eq(false)
-      expect(service.response).to eq(error: "inner service failure")
+      expect(service.response).to eq("inner service failure")
+      expect(service.failure_code).to eq(:inner)
     end
 
     specify "inner service doesn't fail" do
       service = FailingOuterService.run(inner_fail: false)
       expect(service.success?).to eq(false)
-      expect(service.response).to eq(error: "failure")
+      expect(service.response).to eq("failure")
+      expect(service.failure_code).to eq(:outer)
     end
   end
 

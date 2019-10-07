@@ -16,9 +16,9 @@ Simply add `gem "polist"` to your Gemfile.
 class MyService < Polist::Service
   def call
     if params[:ok]
-      success!(code: :cool)
+      success!(result: :cool)
     else
-      fail!(code: :not_cool)
+      fail!(:not_cool, "Not cool")
     end
   end
 end
@@ -30,6 +30,7 @@ service.response #=> { code: :cool }
 service = MyService.run(ok: false)
 service.success? #=> false
 service.response #=> { code: :not_cool }
+service.failure_code #=> :not_cool
 ```
 
 The only parameter that is passed to the service is called `params` by default. If you want more params, feel free to define your own initializer and call the service accordingly:
@@ -210,7 +211,7 @@ c.y # => nil
 
 If you have some common things to be done in more than one service, you can define a middleware and register it inside the said services.
 Every middleware takes the service into it's constructor and executes `#call`. Thus every middleware has to implement `#call` method and has a `#service` attribute reader.
-Middlewares delegate `#success!`, `#fail!`, `#error!`, `#form`, `#form_attributes` to the service class they are registered in.
+Middlewares delegate `#success!`, `#fail!`, `#form`, `#form_attributes` to the service class they are registered in.
 Every middleware should be a subclass of `Polist::Service::Middleware`. Middlewares are run before the service itself is run.
 
 To register a middleware one should use `.register_middleware` class method on a service. More than one middleware can be registered for one service.
@@ -219,7 +220,7 @@ For example:
 ```ruby
 class MyMiddleware < Polist::Service::Middleware
   def call
-    fail!(code: :not_cool) if service.fail_on_middleware?
+    fail!(:not_cool) if service.fail_on_middleware?
   end
 end
 
@@ -227,7 +228,7 @@ class MyService < Polist::Service
   register_middleware MyMiddleware
 
   def call
-    success!(code: :cool)
+    success!(:cool)
   end
 
   def fail_on_middleware?
@@ -237,7 +238,8 @@ end
 
 service = MyService.run
 service.success? #=> false
-service.response #=> { code: :not_cool }
+service.response #=> nil
+service.failure_code #=> :not_cool
 ```
 
 ## Contributing

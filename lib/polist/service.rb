@@ -7,11 +7,19 @@ require "tainbox"
 module Polist
   class Service
     class Failure < StandardError
-      attr_accessor :response
+      attr_accessor :code, :data
 
-      def initialize(response)
-        self.response = response
-        super
+      def initialize(code, data = nil)
+        self.code = code
+        self.data = data
+      end
+
+      def inspect
+        "#{self.class.name}: #{message}"
+      end
+
+      def message
+        data ? "#{code.inspect} => #{data.inspect}" : code.inspect
       end
     end
 
@@ -34,6 +42,7 @@ module Polist
     MiddlewareError = Class.new(StandardError)
 
     attr_accessor :params
+    attr_reader :failure_code
 
     def self.inherited(klass)
       klass.const_set(:Failure, Class.new(klass::Failure))
@@ -86,8 +95,8 @@ module Polist
     def run(&block)
       call(&block)
     rescue self.class::Failure => error
-      @response = error.response
-      @failure = true
+      @response = error.data
+      @failure_code = error.code
     end
 
     def response
@@ -95,15 +104,11 @@ module Polist
     end
 
     def failure?
-      !!@failure
+      !!@failure_code
     end
 
     def success?
       !failure?
-    end
-
-    def validate!
-      error!(form.errors.to_h.values.first) unless form.valid?
     end
 
     private
@@ -122,12 +127,8 @@ module Polist
       params
     end
 
-    def fail!(response = nil)
-      raise self.class::Failure.new(response)
-    end
-
-    def error!(message = "")
-      fail!(error: message)
+    def fail!(code, data = nil)
+      raise self.class::Failure.new(code, data)
     end
 
     def success!(response = nil)

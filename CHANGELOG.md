@@ -1,6 +1,14 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.0] - 2019-10-??
+
+### Changed
+
+- Rework `Polist::Service#fail!` method, now the first argument is failure code (available via `Polist::Service#failure_code` reader) and second argument is data (optional).
+
+### Removed
+
+- Removed `Polist::Service#error!` and `Polist::Service#validate!` methods.
 
 ## [1.2.0] - 2019-03-15
 
@@ -35,7 +43,8 @@
 [1.1.0]: https://github.com/umbrellio/polist/compare/v1.0.0...v1.1.0
 [1.1.1]: https://github.com/umbrellio/polist/compare/v1.1.0...v1.1.1
 [1.2.0]: https://github.com/umbrellio/polist/compare/v1.1.1...v1.2.0
-[Unreleased]: https://github.com/umbrellio/polist/compare/v1.2.0...HEAD
+[2.0.0]: https://github.com/umbrellio/polist/compare/v1.2.0...v2.0.0
+[Unreleased]: https://github.com/umbrellio/polist/compare/v2.0.0...HEAD
 
 [@nesaulov]: https://github.com/nesaulov
 [@VanyaZ158]: https://github.com/VanyaZ158

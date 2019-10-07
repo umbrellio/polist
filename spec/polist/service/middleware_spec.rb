@@ -60,7 +60,7 @@ RSpec.describe Polist::Service::Middleware do
       specify "#response is mutated and error is rescued" do
         middleware = Class.new(Polist::Service::Middleware) do
           def call
-            fail!(failed: true)
+            fail!(:failure, failed: true)
           end
         end
 
