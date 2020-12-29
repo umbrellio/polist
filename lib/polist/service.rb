@@ -39,6 +39,7 @@ module Polist
       klass.const_set(:Failure, Class.new(klass::Failure))
       klass.prepend(MiddlewareCaller)
       klass.instance_variable_set(:@__polist_middlewares__, __polist_middlewares__.dup)
+      super
     end
 
     def self.build(*args, **options)
