@@ -41,16 +41,16 @@ module Polist
       klass.instance_variable_set(:@__polist_middlewares__, __polist_middlewares__.dup)
     end
 
-    def self.build(*args)
-      new(*args)
+    def self.build(*args, **options)
+      new(*args, **options)
     end
 
-    def self.call(*args, &block)
-      build(*args).tap { |service| service.call(&block) }
+    def self.call(*args, **options, &block)
+      build(*args, **options).tap { |service| service.call(&block) }
     end
 
-    def self.run(*args, &block)
-      build(*args).tap { |service| service.run(&block) }
+    def self.run(*args, **options, &block)
+      build(*args, **options).tap { |service| service.run(&block) }
     end
 
     def self.param(*names)

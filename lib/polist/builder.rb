@@ -12,11 +12,11 @@ module Polist
     module ClassMethods
       # Recursively runs class builders on class until no builders on that class found
       # or some builder returns the class itself
-      def build_klass(*args)
+      def build_klass(*args, **options)
         klass = self
 
         loop do
-          new_klass = klass.build!(klass, *args)
+          new_klass = klass.build!(klass, *args, **options)
           break if new_klass == klass
           klass = new_klass
         end
@@ -24,8 +24,8 @@ module Polist
         klass
       end
 
-      def build(*args)
-        build_klass(*args).new(*args)
+      def build(*args, **options)
+        build_klass(*args, **options).new(*args)
       end
     end
   end
