@@ -34,8 +34,6 @@ module Polist
         build_klass(*args, **kwargs).new(*args, **kwargs)
       end
 
-      private
-
       # Recursively runs class builders on class until no builders on that class found
       # or some builder returns the class itself
       def build_klass(*args, **kwargs)
