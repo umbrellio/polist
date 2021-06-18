@@ -1,90 +1,53 @@
 # frozen_string_literal: true
 
-require "uber/builder"
-
 module Polist
   module Builder
     def self.included(base)
-      base.include(Uber::Builder)
       base.extend(ClassMethods)
     end
 
-    module ClassMethods
-      # Recursively runs class builders on class until no builders on that class found
-      # or some builder returns the class itself
-      def build_klass(*args, **options)
-        klass = self
-
-        loop do
-          new_klass = klass.build!(klass, *args, **options)
-          break if new_klass == klass
-          klass = new_klass
-        end
-
-        klass
-      end
-
-      def build(*args, **options)
-        build_klass(*args, **options).new(*args, **options)
-      end
-    end
-  end
-end
-
-module Uber
-  module Builder
-    def self.included(base)
-      base.extend DSL
-      base.extend Build
-    end
-
     class Builders < Array
-      def call(context, *args, **options)
+      def call(context, *args, **kwargs)
         each do |block|
-          klass = block.(context, *args, **options) and return klass # Uber::Value#call()
+          klass = block.call(context, *args, **kwargs) and return klass
         end
 
         context
       end
 
       def <<(proc)
-        super Uber::Option[proc, instance_exec: true]
+        wrapped_proc = -> (ctx, *args, **kwargs) { ctx.instance_exec(*args, **kwargs, &proc) }
+        super(wrapped_proc)
       end
     end
 
-    module DSL
+    module ClassMethods
       def builders
         @builders ||= Builders.new
       end
 
-      def builds(proc=nil, &block)
+      def builds(proc = nil, &block)
         builders << (proc || block)
       end
-    end
 
-    module Build
-      # Call this from your class to compute the concrete target class.
-      def build!(context, *args, **options)
-        builders.(context, *args, **options)
+      def build(*args, **kwargs)
+        build_klass(*args, **kwargs).new(*args, **kwargs)
       end
-    end
-  end
 
-  class Option
-    def self.[](value, options={})
-      case value
-      when Proc
-        if options[:instance_exec]
-          ->(context, *args, **options) { context.instance_exec(*args, **options, &value) }
-        else
-          value
+      private
+
+      # Recursively runs class builders on class until no builders on that class found
+      # or some builder returns the class itself
+      def build_klass(*args, **kwargs)
+        klass = self
+
+        loop do
+          new_klass = klass.builders.call(klass, *args, **kwargs)
+          break if new_klass == klass
+          klass = new_klass
         end
-      when Uber::Callable
-        value
-      when Symbol
-        ->(context, *args, **options){ context.send(value, *args, **options) }
-      else
-        ->(*) { value }
+
+        klass
       end
     end
   end

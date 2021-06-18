@@ -104,7 +104,10 @@ module Polist
     end
 
     def validate!
-      error!(form.errors.to_hash.values.first) unless form.valid?
+      return if form.valid?
+      first_error = form.errors.to_hash.values.first
+      first_error = first_error.first if first_error.is_a?(Array)
+      error!(first_error)
     end
 
     private
