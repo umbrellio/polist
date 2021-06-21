@@ -50,3 +50,4 @@
 [#3]: https://github.com/umbrellio/polist/pull/3
 [#4]: https://github.com/umbrellio/polist/pull/4
 [#5]: https://github.com/umbrellio/polist/pull/5
+[#7]: https://github.com/umbrellio/polist/pull/7
