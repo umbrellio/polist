@@ -1,5 +1,11 @@
 # Polist   [![Gem Version](https://badge.fury.io/rb/polist.svg)](https://badge.fury.io/rb/polist) [![Build Status](https://travis-ci.org/umbrellio/polist.svg?branch=master)](https://travis-ci.org/umbrellio/polist) [![Coverage Status](https://coveralls.io/repos/github/umbrellio/polist/badge.svg?branch=master)](https://coveralls.io/github/umbrellio/polist?branch=master)
 
+## DEPRECATION NOTICE
+
+This gem is no longer actively maintained. As a replacement, you can use [Resol](https://github.com/umbrellio/resol) as well as gems from [smart-rb](https://github.com/smart-rb) family.
+
+## Description
+
 Polist is a set of simple tools for creating business logic layer of your applications:
 
 - `Polist::Service` is a simple class designed for creating service classes.
