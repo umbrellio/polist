@@ -39,18 +39,19 @@ module Polist
       klass.const_set(:Failure, Class.new(klass::Failure))
       klass.prepend(MiddlewareCaller)
       klass.instance_variable_set(:@__polist_middlewares__, __polist_middlewares__.dup)
+      super
     end
 
-    def self.build(*args)
-      new(*args)
+    def self.build(*args, **options)
+      new(*args, **options)
     end
 
-    def self.call(*args, &block)
-      build(*args).tap { |service| service.call(&block) }
+    def self.call(*args, **options, &block)
+      build(*args, **options).tap { |service| service.call(&block) }
     end
 
-    def self.run(*args, &block)
-      build(*args).tap { |service| service.run(&block) }
+    def self.run(*args, **options, &block)
+      build(*args, **options).tap { |service| service.run(&block) }
     end
 
     def self.param(*names)
@@ -103,7 +104,10 @@ module Polist
     end
 
     def validate!
-      error!(form.errors.to_h.values.first) unless form.valid?
+      return if form.valid?
+      first_error = form.errors.to_hash.values.first
+      first_error = first_error.first if first_error.is_a?(Array)
+      error!(first_error)
     end
 
     private
