@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    polist (1.3.0)
+    polist (1.4.0)
       activemodel (>= 3.0)
       plissken (>= 0.3)
       tainbox
